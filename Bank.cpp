@@ -61,6 +61,11 @@ class SavAccount:public Account{
 
 };
 
+template <class T>
+void accountServices(T& v){
+        cout<<""
+}
+
 int main(){
     int input=0,i,mobile,exist_num,index;
     string name,address,password;
@@ -127,9 +132,11 @@ int main(){
                             if(v1.at(index).getAccNo()==exist_num) break;
                         }
                         break;
+                        //need to use template at many places
                         cout<<"Enter your Password"<<endl;
                         cin>>password;
-                        if(v1.at(index).getPassword()==password )
+                        if(v1.at(index).getPassword()==password ) accountServices(v1.at(index));
+                        else cout<<"Wrong Password Entered.Please Try Again";
                     case 2:
 
                         break;
