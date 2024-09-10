@@ -16,7 +16,7 @@ class Account{
  public:
     //constructor
     Account(){
-        acc_no=acc_no++;
+        acc_no=++acc_no;
     }
 
     //setters
@@ -96,6 +96,7 @@ int main(){
                 switch(i)
                 {  
                     case 1:
+
                         v1.emplace_back();
                         cout<<"Enter  The Bank Details:"<<endl;
                         cout<<"Account Holder Name:"<<endl;
@@ -112,6 +113,9 @@ int main(){
                         getline(cin,password);
                         v1.back().setPassword(password);
                         cout<<"Registration Successful"<<endl;
+                        cout<<"Your Account NUmber is "<<v1.back().getAccNo()<<endl;
+                        
+
                         break;
                     case 2:
                         v2.emplace_back();
@@ -139,6 +143,7 @@ int main(){
                         }
                         
                         //need to use template at many places
+                        //have to add loop for wrong password
                         cout<<"Enter your Password"<<endl;
                         cin>>password;
                         if(v1.at(index).getPassword()==password ) accountServices(v1.at(index));
