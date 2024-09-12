@@ -37,6 +37,16 @@ class Account{
         this->password=password;
     }
 
+    void setBalance(int balance){
+        this->balance+=balance;
+    }
+
+    void withdrawal(int withdraw){
+
+        this->balance-=withdraw;
+    }
+
+
     //getters
     int getAccNo(){
         return acc_no;
@@ -46,8 +56,13 @@ class Account{
         return password;
     }
 
+    int getBalance(){
+        return  balance;
+    }
+
     //print details
     void printDetails(){
+        cout<<"------------------------------------------------------"<<endl;
         cout<<"Account Number: "<<acc_no<<endl;
         cout<<"Account Name: "<<acc_name<<endl;
         cout<<"Balance: "<<balance<<endl;
@@ -98,7 +113,8 @@ void registration(T& v,string& name,string& address,string& password,string& mob
 
 template <class T>
 void accountServices(T& v,int& index){
-        int i=0;
+        int i=0,amount,withdraw;
+        string password;
         cout << "\033[2J\033[1;1H";
         cout<<"------------------------------------------------------"<<endl;
         cout<<"Choose the services you want to avail:"<<endl;//chequebook can be added later
@@ -114,10 +130,25 @@ void accountServices(T& v,int& index){
                     v.at(index).printDetails();
                     break;
                 case 2:
+                    cout<<"Enter the amount you want to deposit:"<<endl;
+                    cin>>amount;
+                    v.at(index).setBalance(amount);
+                    cout<<"Deposit Successful"<<endl<<"Deposited  Amount is "<<amount<<endl;
                     break;
                 case 3:
+                    cout<<"Enter the amount you want to withdraw:"<<endl;
+                    cin>>withdraw;
+                    //cout<<"Enter The Password for authorization:"<<endl;
+                    if(checkPass(v,index,password)){
+                        if(v.at(index).getBalance()>=withdraw){
+                         v.at(index).withdrawal(withdraw);
+                         cout<<"Transaction Successful."<<endl;
+                        }
+                        else cout<<"Insufficient Balance!!"<<endl;
+                    }
                     break;
                 case 4:
+                    cout<<"Your Balance:"<<v.at(index).getBalance();
                     break;
                 case 5:
                     break;
@@ -148,9 +179,9 @@ void mainMenu(void){
 
 template <class T>
 bool checkPass(T& v,int& index,string& password){
-    int flag1=0;
+    int flag1=0,attempt=0;
     while(flag1==0){
-        cout<<"Enter your Password"<<endl;
+        cout<<"Enter your Password for authorization:"<<endl;
         cin>>password;
         if(v.at(index).getPassword()==password )
         {
@@ -158,14 +189,19 @@ bool checkPass(T& v,int& index,string& password){
             break;
         }
         else cout<<"Wrong Password Entered.Please Try Again"<<endl;
+        attempt++;
+        if(attempt>5){
+            cout<<"Maximum Attempts Exceeded!!"<<endl;
+            break;
+        }
     }
     if (flag1==1) return true;
     else return false;
 }
 
 template <class T>
-void checkAccount(T& v,int& index,int& exist_num){
-    int flag=0;
+bool checkAccount(T& v,int& index,int& exist_num){
+    int flag=0,attempt=0;
     while(flag==0){
         cout<<"Enter Your Account No."<<endl;
         cin>>exist_num;
@@ -176,7 +212,14 @@ void checkAccount(T& v,int& index,int& exist_num){
             }
         }
         if(flag==0) cout<<"No Such Account Exist.PLease Try Again"<<endl;
+        attempt++;
+        if(attempt>3){
+            cout<<"Maximum Attempts  Exceeded!!"<<endl;
+            break;
+        }
     }
+    if(flag==0) return false;
+    if(flag==1) return true;
 
 }
 
@@ -227,27 +270,36 @@ int main(){
             break;
         case 2:
             i=0;
-            while(i!=1 && i!=2){
+            while(i!=1 && i!=2 && i!=3){
                 cout<<"Enter Your Account Type:"<<endl;
-                cout<<"1.Current Account"<<endl<<"2.Savings Account"<<endl;
+                cout<<"1.Current Account"<<endl<<"2.Savings Account"<<endl<<"3.Exit to Main Menu"<<endl;
                 cout<<"------------------------------------------------------"<<endl;
                 cin>>i;
                 cout<<"------------------------------------------------------"<<endl;
                 switch(i){
                     case 1:
 
-                        checkAccount(v1,index,exist_num);
+                        if(checkAccount(v1,index,exist_num)){
+                            if(checkPass(v1,index,password)) accountServices(v1,index);
+                        }
 
-                        if(checkPass(v1,index,password)) accountServices(v1,index);
+                        //if(checkPass(v1,index,password)) accountServices(v1,index);
 
                         cout<<"------------------------------------------------------"<<endl;
                         break;
                     case 2:
 
-                        checkAccount(v2,index,exist_num);
+                        if(checkAccount(v2,index,exist_num)){
+                            if(checkPass(v2,index,password)) accountServices(v2,index);
+                        }
 
-                        if(checkPass(v2,index,password)) accountServices(v2,index);
+                        //if(checkPass(v2,index,password)) accountServices(v2,index);
                         cout<<"------------------------------------------------------"<<endl;
+                        break;
+                    case 3:
+                        break;
+                    default:
+                        cout<<"You Have entered invalid choice, please choose again"<<endl;
                         break;
                 }
             }
