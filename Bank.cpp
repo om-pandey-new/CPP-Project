@@ -10,6 +10,7 @@ class Account{
     int balance;
     string mobile;
     string address;
+    string email;
     int pin;
     string password;
 
@@ -35,6 +36,10 @@ class Account{
 
     void setPassword(string password){
         this->password=password;
+    }
+
+    void setEmail(string email){
+        this->email=email;
     }
 
     void setBalance(int balance){
@@ -68,6 +73,7 @@ class Account{
         cout<<"Balance: "<<balance<<endl;
         cout<<"Mobile Number: "<<mobile<<endl;
         cout<<"Address: "<<address<<endl;
+        cout<<"Email: "<<email<<endl;
         cout<<"------------------------------------------------------"<<endl;
 
 
@@ -89,7 +95,40 @@ class SavAccount:public Account{
 };
 
 template <class T>
-void registration(T& v,string& name,string& address,string& password,string& mobile){
+void update(T& v,int& index,string& mobile,string& email,string&  address){
+
+    int up=0;
+    while(up!=4){
+        cout<<"Select the  field you want to update"<<endl;
+        cout<<"1.Mobile  Number"<<endl<<"2.Email Id"<<endl<<"3.Address"<<endl<<"4.Go Back to Previous Menu"<<endl;
+        cin>>up;
+        switch(up){
+            case 1:
+                cout<<"Enter the new mobile number"<<endl;
+                cin>>mobile;
+                v.at(index).setMobile(mobile);
+                break;
+            case 2:
+                cout<<"Enter the new email id"<<endl;
+                cin>>email;
+                v.at(index).setEmail(email);
+                break;
+            case 3:
+                cout<<"Enter the new address"<<endl;
+                cin>>address;
+                v.at(index).setAddress(address);
+                break;
+            case 4:
+                break;
+            default:
+                cout<<"Invalid Choice!! Try Again"<<endl;
+        }
+    }
+
+}
+
+template <class T>
+void registration(T& v,string& name,string& address,string& email,string& password,string& mobile){
         v.emplace_back();
         cout<<"Enter  The Bank Details:"<<endl;
         cout<<"------------------------------------------------------"<<endl;
@@ -103,9 +142,13 @@ void registration(T& v,string& name,string& address,string& password,string& mob
         cout<<"Enter Your Address:"<<endl;
         getline(cin,address);
         v.back().setAddress(address);
+        cout<<"Enter Your Email Id:"<<endl;
+        getline(cin,email);
+        v.back().setEmail(email);
         cout<<"Create Your Password:"<<endl;
         getline(cin,password);
         v.back().setPassword(password);
+        cout << "\033[2J\033[1;1H";
         cout<<"---Registration Successful---"<<endl;
         cout<<"Your Account NUmber is "<<v.back().getAccNo()<<endl;
 
@@ -114,7 +157,7 @@ void registration(T& v,string& name,string& address,string& password,string& mob
 template <class T>
 void accountServices(T& v,int& index){
         int i=0,amount,withdraw;
-        string password;
+        string password,mobile,address,email;
         cout << "\033[2J\033[1;1H";
         cout<<"------------------------------------------------------"<<endl;
         cout<<"Choose the services you want to avail:"<<endl;//chequebook can be added later
@@ -151,6 +194,7 @@ void accountServices(T& v,int& index){
                     cout<<"Your Balance:"<<v.at(index).getBalance();
                     break;
                 case 5:
+                    update(v,index,mobile,email,address);
                     break;
                 case 6:
                     break;
@@ -225,7 +269,7 @@ bool checkAccount(T& v,int& index,int& exist_num){
 
 //int flag1=0;
 int input=0,i,exist_num,index;//flag=0;
-string name,address,password,mobile;
+string name,address,password,mobile,email;
 
 int main(){
     
@@ -251,11 +295,11 @@ int main(){
                 switch(i)
                 {  
                     case 1:
-                        registration(v1,name,address,password,mobile);
+                        registration(v1,name,address,email,password,mobile);
                         break;
 
                     case 2:
-                        registration(v2,name,address,password,mobile);
+                        registration(v2,name,address,email,password,mobile);
                         break;
 
                     default:
