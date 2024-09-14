@@ -7,12 +7,14 @@ using namespace std;
 class Account{
     static int acc_no;
     string acc_name;
-    int balance;
     string mobile;
     string address;
     string email;
     int pin;
     string password;
+
+ protected:
+    int balance;
 
  public:
     //constructor
@@ -46,10 +48,6 @@ class Account{
         this->balance+=balance;
     }
 
-    void withdrawal(int withdraw){
-
-        this->balance-=withdraw;
-    }
 
 
     //getters
@@ -84,13 +82,31 @@ class Account{
 int Account::acc_no = 1000;
 
 class CurrAccount:public Account{
+    
+public:
+        void withdrawal(int withdraw){
+        if (withdraw>balance){
+            cout<<"Insufficient Balance"<<endl<<"Overdraft Facility Availed"<<endl;
+        }
+        this->balance-=withdraw;
+        cout<<"Transaction Successful"<<endl;
 
-
+    }
 
 }; 
 
 class SavAccount:public Account{
 
+public:
+        void withdrawal(int withdraw){
+        if(withdraw<=balance) {
+            this->balance-=withdraw;
+            cout<<"Transaction Successful."<<endl;
+        }
+        else{
+            cout<<"Insufficient Balance!!"<<endl<<"Transaction Failed."<<endl;
+        }
+    }
 
 };
 
@@ -99,24 +115,35 @@ void update(T& v,int& index,string& mobile,string& email,string&  address){
 
     int up=0;
     while(up!=4){
+        cout<<"------------------------------------------------------"<<endl;
         cout<<"Select the  field you want to update"<<endl;
         cout<<"1.Mobile  Number"<<endl<<"2.Email Id"<<endl<<"3.Address"<<endl<<"4.Go Back to Previous Menu"<<endl;
+        cout<<"------------------------------------------------------"<<endl;
         cin>>up;
         switch(up){
             case 1:
+                cout<<"------------------------------------------------------"<<endl;
                 cout<<"Enter the new mobile number"<<endl;
                 cin>>mobile;
                 v.at(index).setMobile(mobile);
+                cout<<"Mobile Number successfully updated"<<endl;
+                cout<<"------------------------------------------------------"<<endl;
                 break;
             case 2:
+                cout<<"------------------------------------------------------"<<endl;
                 cout<<"Enter the new email id"<<endl;
                 cin>>email;
                 v.at(index).setEmail(email);
+                cout<<"Email-Id  successfully updated"<<endl;
+                cout<<"------------------------------------------------------"<<endl;
                 break;
             case 3:
+                cout<<"------------------------------------------------------"<<endl;
                 cout<<"Enter the new address"<<endl;
                 cin>>address;
                 v.at(index).setAddress(address);
+                cout<<"Address successfully  updated"<<endl;
+                cout<<"------------------------------------------------------"<<endl;
                 break;
             case 4:
                 break;
@@ -156,7 +183,7 @@ void registration(T& v,string& name,string& address,string& email,string& passwo
 
 template <class T>
 void accountServices(T& v,int& index){
-        int i=0,amount,withdraw;
+        int i=0,amount,withdraw,j=0;
         string password,mobile,address,email;
         cout << "\033[2J\033[1;1H";
         cout<<"------------------------------------------------------"<<endl;
@@ -183,20 +210,32 @@ void accountServices(T& v,int& index){
                     cin>>withdraw;
                     //cout<<"Enter The Password for authorization:"<<endl;
                     if(checkPass(v,index,password)){
-                        if(v.at(index).getBalance()>=withdraw){
+                        //if(v.at(index).getBalance()>=withdraw){
                          v.at(index).withdrawal(withdraw);
-                         cout<<"Transaction Successful."<<endl;
-                        }
-                        else cout<<"Insufficient Balance!!"<<endl;
+                         //cout<<"Transaction Successful."<<endl;
+                        //}
+                        //else cout<<"Insufficient Balance!!"<<endl;
                     }
                     break;
                 case 4:
-                    cout<<"Your Balance:"<<v.at(index).getBalance();
+                    cout<<"Your Balance is:"<<v.at(index).getBalance()<<endl;
                     break;
                 case 5:
                     update(v,index,mobile,email,address);
                     break;
                 case 6:
+                    cout<<"Choose the Type:"<<endl<<"1.Credit Card"<<endl<<"2.Debit Card"<<endl;
+                    cin>>j;
+                    switch(j)
+                    {
+                        case 1:
+                            break;
+                        case 2:
+                            break;
+                        default:
+                            cout<<"Invalid Choice!!"<<endl;
+                            break;
+                    }
                     break;
                 case 7:
                     break;
