@@ -4,8 +4,10 @@
 #include <limits>
 using namespace std;
 
-class Account{
-    static int acc_no,cred_no;
+class Account {
+    static int acc_counter; // To generate unique account numbers for each account
+    int acc_no;             // Now, non-static, so unique for each account
+    static int cred_no;
     string acc_name;
     string mobile;
     string address;
@@ -13,106 +15,99 @@ class Account{
     int pin;
     string password;
 
- protected:
+protected:
     int balance;
 
- public:
-    //constructor
-    Account(){
-        acc_no=++acc_no;
-        balance=0;
+public:
+    // Constructor
+    Account() : acc_no(++acc_counter), balance(0) {}
+
+    // Setters
+    void setAccName(string acc_name) {
+        this->acc_name = acc_name;
     }
 
-    //setters
-    void setAccName(string acc_name){
-        this->acc_name=acc_name;
+    void setMobile(string mobile) {
+        this->mobile = mobile;
     }
 
-    void setMobile(string mobile){
-        this->mobile=mobile;
+    void setAddress(string address) {
+        this->address = address;
     }
 
-    void setAddress(string address){
-        this->address=address;
+    void setPassword(string password) {
+        this->password = password;
     }
 
-    void setPassword(string password){
-        this->password=password;
+    void setEmail(string email) {
+        this->email = email;
     }
 
-    void setEmail(string email){
-        this->email=email;
+    void setBalance(int balance) {
+        this->balance += balance;
     }
 
-    void setBalance(int balance){
-        this->balance+=balance;
+    // Getters
+    int getAccNo() {
+        return acc_no; // Now each account has a unique account number
     }
 
-
-
-    //getters
-    int getAccNo(){
-        return acc_no;
-    }
-
-    string getPassword(){
+    string getPassword() {
         return password;
     }
 
-    int getBalance(){
-        return  balance;
+    int getBalance() {
+        return balance;
     }
 
-    //print details
-    void printDetails(){
-        cout<<"------------------------------------------------------"<<endl;
-        cout<<"Account Number: "<<acc_no<<endl;
-        cout<<"Account Name: "<<acc_name<<endl;
-        cout<<"Balance: "<<balance<<endl;
-        cout<<"Mobile Number: "<<mobile<<endl;
-        cout<<"Address: "<<address<<endl;
-        cout<<"Email: "<<email<<endl;
-        cout<<"------------------------------------------------------"<<endl;
-
+    // Print account details
+    void printDetails() {
+        cout << "------------------------------------------------------" << endl;
+        cout << "Account Number: " << acc_no << endl;
+        cout << "Account Name: " << acc_name << endl;
+        cout << "Balance: " << balance << endl;
+        cout << "Mobile Number: " << mobile << endl;
+        cout << "Address: " << address << endl;
+        cout << "Email: " << email << endl;
+        cout << "------------------------------------------------------" << endl;
     }
 
-    void creditCard(){
-        cred_no=++cred_no; 
+    void creditCard() {
+        cred_no = ++cred_no;
     }
-
 };
 
-int Account::acc_no = 1000;
+// Initialize static members
+int Account::acc_counter = 1000; // Starts account numbering from 1000
 int Account::cred_no = 1596;
 
-class CurrAccount:public Account{
-    
+class CurrAccount : public Account {
 public:
-        void withdrawal(int withdraw){
-        if (withdraw>balance){
-            cout<<"Insufficient Balance"<<endl<<"Overdraft Facility Availed"<<endl;
+    bool withdrawal(int withdraw) {
+        if (withdraw > balance) {
+            cout << "Insufficient Balance" << endl << "Overdraft Facility Availed" << endl;
         }
-        this->balance-=withdraw;
-        cout<<"Transaction Successful"<<endl;
-
+        this->balance -= withdraw;
+        cout << "Transaction Successful" << endl;
+        return true;
     }
-
-}; 
-
-class SavAccount:public Account{
-
-public:
-        void withdrawal(int withdraw){
-        if(withdraw<=balance) {
-            this->balance-=withdraw;
-            cout<<"Transaction Successful."<<endl;
-        }
-        else{
-            cout<<"Insufficient Balance!!"<<endl<<"Transaction Failed."<<endl;
-        }
-    }
-
 };
+
+class SavAccount : public Account {
+public:
+    bool withdrawal(int withdraw) {
+        if (withdraw <= balance) {
+            this->balance -= withdraw;
+            cout << "Transaction Successful." << endl;
+            return true;
+        } else {
+            cout << "Insufficient Balance!!" << endl << "Transaction Failed." << endl;
+            return false;
+        }
+    }
+};
+
+// Other functions related to account registration, services, etc. remain unchanged
 
 template <class T>
 bool checkPass(T& v,int& index,string& password){
@@ -232,15 +227,19 @@ void registration(T& v,string& name,string& address,string& email,string& passwo
 }
 
 template <class T>
-void transfer(T& v,int& index2){
+void transfer(T& v,int& index2,int& index){
     int amount;
+    string password;
     cout<<"Enter The Amount You want to transfer:"<<endl;
     cin>>amount;
-    v.at(index2).setBalance(amount);
+    if(checkPass(v,index2,password)){
+        if(v.at(index).withdrawal(amount)) v.at(index2).setBalance(amount);
+    }
+    else cout<<"Wrong Password Entered.Transaction Failed!!"<<endl;
 }
 
 template <class T>
-void accountServices(T& v,int& index){
+void accountServices(T& v,int& index,vector<CurrAccount>& v1,vector<SavAccount>& v2){
         int i=0,amount,withdraw,j=0,k=0,l=0,index2=0,exist_num2;
         string password,mobile,address,email;
         cout << "\033[2J\033[1;1H";
@@ -276,12 +275,16 @@ void accountServices(T& v,int& index){
                     {
                         case 1:
                             if(checkAccount(v1,index2,exist_num2)){
-                                transfer(v1,index2);
+                                transfer(v1,index2,index);
                             }
                             break;
                         case 2:
+                            if(checkAccount(v2,index2,exist_num2)){
+                                transfer(v2,index2,index);
+                            }
                             break;
                         default:
+                            cout<<"Invalid Choice!!"<<endl;
                             break;
                     }
 
@@ -349,6 +352,7 @@ int main(){
     mainMenu();
     vector<CurrAccount> v1;
     vector<SavAccount> v2;
+    
     while(input!=5){
 
         cout<<"Please Enter Your Choice: "<<endl;
@@ -370,11 +374,9 @@ int main(){
                     case 1:
                         registration(v1,name,address,email,password,mobile);
                         break;
-
                     case 2:
                         registration(v2,name,address,email,password,mobile);
                         break;
-
                     default:
                         cout<<"You Have entered invalid choice, please choose again"<<endl;
                         break;
@@ -397,7 +399,7 @@ int main(){
                     case 1:
 
                         if(checkAccount(v1,index,exist_num)){
-                            if(checkPass(v1,index,password)) accountServices(v1,index);
+                            if(checkPass(v1,index,password)) accountServices(v1,index,v1,v2);
                         }
 
                         //if(checkPass(v1,index,password)) accountServices(v1,index);
@@ -407,9 +409,8 @@ int main(){
                     case 2:
 
                         if(checkAccount(v2,index,exist_num)){
-                            if(checkPass(v2,index,password)) accountServices(v2,index);
+                            if(checkPass(v2,index,password)) accountServices(v2,index,v1,v2);
                         }
-
                         //if(checkPass(v2,index,password)) accountServices(v2,index);
                         cout<<"------------------------------------------------------"<<endl;
                         break;
@@ -428,17 +429,15 @@ int main(){
             cout<<"Enter Again or Press 5 To Exit"<<endl;
             break;
         case 4:
-           
             cout<<"Enter Again or Press 5 To Exit"<<endl;
             break;
         case 5:
             cout<<"Thank you for visiting us"<<endl;
             break;
-        
         default:
             cout<<"Wrong Choice Entered"<<endl<<"Enter Again or Press 5 To Exit"<<endl;
             break;
         }
     }
     return 0;
-}
+} 
