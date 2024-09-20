@@ -155,6 +155,14 @@ bool checkAccount(T& v,int& index,int& exist_num){
 
 }
 
+bool isValidMobile(string& mobile){
+    int count=0;
+    for(char c:mobile){
+        if(!isdigit(c)) return false;
+    }
+    if(mobile.size()!=10) return false;
+    return true;
+}
 
 template <class T>
 void update(T& v,int& index,string& mobile,string& email,string&  address){
@@ -169,8 +177,13 @@ void update(T& v,int& index,string& mobile,string& email,string&  address){
         switch(up){
             case 1:
                 cout<<"------------------------------------------------------"<<endl;
-                cout<<"Enter the new mobile number"<<endl;
-                cin>>mobile;
+                do{
+                    cout<<"Enter The New Mobile Number:"<<endl;
+                    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+                    getline(cin,mobile);
+                    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+                    if(!isValidMobile(mobile)) cout<<"Invalid Entry!!Please Enter Only digits"<<endl;
+                }while(!isValidMobile(mobile)); 
                 v.at(index).setMobile(mobile);
                 cout<<"Mobile Number successfully updated"<<endl;
                 cout<<"------------------------------------------------------"<<endl;
@@ -199,6 +212,8 @@ void update(T& v,int& index,string& mobile,string& email,string&  address){
     }
 }
 
+
+
 template <class T>
 void registration(T& v,string& name,string& address,string& email,string& password,string& mobile){
         v.emplace_back();
@@ -208,8 +223,11 @@ void registration(T& v,string& name,string& address,string& email,string& passwo
         cin.ignore(numeric_limits<streamsize>::max(), '\n');
         getline(cin,name);
         v.back().setAccName(name);
-        cout<<"Mobile Phone:"<<endl;
-        getline(cin,mobile);
+        do{
+            cout<<"Mobile Phone:"<<endl;
+            getline(cin,mobile);
+            if(!isValidMobile(mobile)) cout<<"Invalid Entry!!Please Enter Only digits"<<endl;
+        }while(!isValidMobile(mobile));   
         v.back().setMobile(mobile);
         cout<<"Enter Your Address:"<<endl;
         getline(cin,address);
@@ -226,14 +244,14 @@ void registration(T& v,string& name,string& address,string& email,string& passwo
 
 }
 
-template <class T>
-void transfer(T& v,int& index2,int& index){
+template <class T1,class T2>
+void transfer(T1& v,int& index2,T2& V,int& index){
     int amount;
     string password;
     cout<<"Enter The Amount You want to transfer:"<<endl;
     cin>>amount;
-    if(checkPass(v,index2,password)){
-        if(v.at(index).withdrawal(amount)) v.at(index2).setBalance(amount);
+    if(checkPass(V,index,password)){
+        if(V.at(index).withdrawal(amount)) v.at(index2).setBalance(amount);
     }
     else cout<<"Wrong Password Entered.Transaction Failed!!"<<endl;
 }
@@ -275,12 +293,12 @@ void accountServices(T& v,int& index,vector<CurrAccount>& v1,vector<SavAccount>&
                     {
                         case 1:
                             if(checkAccount(v1,index2,exist_num2)){
-                                transfer(v1,index2,index);
+                                transfer(v1,index2,v,index);
                             }
                             break;
                         case 2:
                             if(checkAccount(v2,index2,exist_num2)){
-                                transfer(v2,index2,index);
+                                transfer(v2,index2,v,index);
                             }
                             break;
                         default:
