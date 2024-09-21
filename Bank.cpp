@@ -6,13 +6,12 @@ using namespace std;
 
 class Account {
     static int acc_counter; // To generate unique account numbers for each account
-    int acc_no;             // Now, non-static, so unique for each account
+    int acc_no;             
     static int cred_no;
     string acc_name;
     string mobile;
     string address;
     string email;
-    int pin;
     string password;
 
 protected:
@@ -72,14 +71,12 @@ public:
         cout << "------------------------------------------------------" << endl;
     }
 
-    void creditCard() {
-        cred_no = ++cred_no;
-    }
+
 };
 
 // Initialize static members
 int Account::acc_counter = 1000; // Starts account numbering from 1000
-int Account::cred_no = 1596;
+
 
 class CurrAccount : public Account {
 public:
@@ -91,6 +88,10 @@ public:
         cout << "Transaction Successful" << endl;
         return true;
     }
+
+    void addInterest() {
+        cout << "Interest Facility is not provided in Current Account!!"<< endl;
+    }
 };
 
 class SavAccount : public Account {
@@ -100,12 +101,67 @@ public:
             this->balance -= withdraw;
             cout << "Transaction Successful." << endl;
             return true;
-        } else {
+        }
+        else {
             cout << "Insufficient Balance!!" << endl << "Transaction Failed." << endl;
             return false;
         }
     }
+
+    void addInterest() {
+        int interestRate = 5; // 5% interest rate, can be changed
+        int interestAmount = (getBalance() * interestRate) / 100;
+        setBalance(interestAmount);
+        cout << "Interest added: " << interestAmount << endl;
+    }
 };
+
+class Loan {
+private:
+    static int loan_counter;
+    int loanId;
+    string loanType;
+    double loanAmount;
+    int tenure;
+    string mobileNumber;
+
+public:
+    Loan() : loanId(++loan_counter) {}
+
+    void setLoanType(string loanType) {
+        this->loanType = loanType;
+    }
+
+    void setLoanAmount(double loanAmount) {
+        this->loanAmount = loanAmount;
+    }
+
+    void setTenure(int tenure) {
+        this->tenure = tenure;
+    }
+
+    void setMobileNumber(string mobileNumber) {
+        this->mobileNumber = mobileNumber;
+    }
+
+    void printLoanDetails() {
+        cout<<"------------------------------------------------------"<<endl;
+        cout<<"Your Loan Details Are:"<<endl;
+
+        cout << "Loan ID: " << loanId << endl;
+        cout << "Loan Type: " << loanType << endl;
+        cout << "Loan Amount: " << loanAmount << endl;
+        cout << "Tenure: " << tenure << " months" << endl;
+        cout << "Mobile Number: " << mobileNumber << endl;
+        cout << "Your loan ID is: " << loanId << endl;
+        cout<<"------------------------------------------------------"<<endl;
+        cout<<"Thank You for Applying Loan!!"<<endl<<"Your Loan Request Has Been Successfully Processed!!"<<endl;
+        cout << "Further process will be done by bank advisor, who will contact you on your mobile number: " << mobileNumber << endl;
+    }
+};
+
+int Loan::loan_counter = 2000; // Initialize the loan counter
+
 
 // Other functions related to account registration, services, etc. remain unchanged
 
@@ -177,11 +233,10 @@ void update(T& v,int& index,string& mobile,string& email,string&  address){
         switch(up){
             case 1:
                 cout<<"------------------------------------------------------"<<endl;
+                cin.ignore(numeric_limits<streamsize>::max(), '\n');
                 do{
                     cout<<"Enter The New Mobile Number:"<<endl;
-                    cin.ignore(numeric_limits<streamsize>::max(), '\n');
                     getline(cin,mobile);
-                    cin.ignore(numeric_limits<streamsize>::max(), '\n');
                     if(!isValidMobile(mobile)) cout<<"Invalid Entry!!Please Enter Only digits"<<endl;
                 }while(!isValidMobile(mobile)); 
                 v.at(index).setMobile(mobile);
@@ -263,8 +318,8 @@ void accountServices(T& v,int& index,vector<CurrAccount>& v1,vector<SavAccount>&
         cout << "\033[2J\033[1;1H";
         cout<<"------------------------------------------------------"<<endl;
         cout<<"Choose the services you want to avail:"<<endl;//chequebook can be added later
-        cout<<"1.Know Your Details"<<endl<<"2.Deposit Amount"<<endl<<"3.Withdrawal "<<"4.Transfer Money To Another Bank Account"<<endl<<"5.Check Balance"<<endl;
-        cout<<"6.Update Details"<<endl<<"7.Card Services"<<endl<<"8.Terminate Account"<<endl<<"9.Go To  Main Menu"<<endl;
+        cout<<"1.Know Your Details"<<endl<<"2.Deposit Amount"<<endl<<"3.Withdrawal "<<endl<<"4.Transfer Money To Another Bank Account"<<endl<<"5.Check Balance"<<endl;
+        cout<<"6.Update Details"<<endl<<"7.Calculate Interest"<<endl<<"8.Terminate Account"<<endl<<"9.Go To  Main Menu"<<endl;
         cout<<"------------------------------------------------------"<<endl;
         while(i!=9){
             cout<<"PLease Enter Your Choice:"<<endl;
@@ -305,7 +360,6 @@ void accountServices(T& v,int& index,vector<CurrAccount>& v1,vector<SavAccount>&
                             cout<<"Invalid Choice!!"<<endl;
                             break;
                     }
-
                 case 5:
                     cout<<"Your Balance is:"<<v.at(index).getBalance()<<endl;
                     break;
@@ -313,31 +367,15 @@ void accountServices(T& v,int& index,vector<CurrAccount>& v1,vector<SavAccount>&
                     update(v,index,mobile,email,address);
                     break;
                 case 7:
-                    cout<<"Choose the Type:"<<endl<<"1.Credit Card"<<endl<<"2.Debit Card"<<endl;
-                    cin>>j;
-                    switch(j)
-                    {
-                        case 1:
-                            cout<<"------------------------------------------------------"<<endl;
-                            cout<<"1.Apply for a New Card "<<endl<<"2.Login Into  Existing Card "<<endl;
-                            cin>>k;
-                            switch(k)
-                            {
-                                case 1:
-                                    
-                                    break;
-                                case 2:
-                                    break;   
-                            }
-                            break;
-                        case 2:
-                            break;
-                        default:
-                            cout<<"Invalid Choice!!"<<endl;
-                            break;
-                    }
+                    v.at(index).addInterest();
                     break;
                 case 8:
+                    if (checkPass(v, index, password)) {
+                        v.erase(v.begin() + index);
+                        cout << "Account terminated successfully." << endl;
+                        i=10;
+                    } 
+                    else cout << "Invalid password. Account termination failed." << endl;
                     break;
                 case 9:
                     break;
@@ -370,6 +408,7 @@ int main(){
     mainMenu();
     vector<CurrAccount> v1;
     vector<SavAccount> v2;
+    vector<Loan> loans;
     
     while(input!=5){
 
@@ -444,11 +483,72 @@ int main(){
             mainMenu();
             break;
         case 3:
+            i=0;
+            cout<<"1.Apply for Loan"<<endl;
+            cout<<"Please Enter Your Choice"<<endl;
+            cin>>i;
+            switch(i){
+                case 1:{
+                    loans.emplace_back();
+                    cout << "Enter loan type (e.g. personal, home, car): ";
+                    string loanType;
+                    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+                    getline(cin, loanType);
+                    loans.back().setLoanType(loanType);
+
+                    cout << "Enter loan amount: ";
+                    double loanAmount;
+                    cin >> loanAmount;
+                    loans.back().setLoanAmount(loanAmount);
+
+                    cout << "Enter tenure (in months): ";
+                    int tenure;
+                    cin >> tenure;
+                    loans.back().setTenure(tenure);
+
+                    cout << "Enter your mobile number: ";
+                    string mobileNumber;
+                    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+                    getline(cin, mobileNumber);
+                    loans.back().setMobileNumber(mobileNumber);
+
+                    loans.back().printLoanDetails();
+                    break;
+                }
+                case 2:
+                    break;
+            }
             cout<<"Enter Again or Press 5 To Exit"<<endl;
             break;
-        case 4:
-            cout<<"Enter Again or Press 5 To Exit"<<endl;
-            break;
+        case 4: {
+                cout << "Contact Us:" << endl;
+                cout<<"------------------------------------------------------"<<endl;
+                cout << "National Bank" << endl;
+                cout << "Head Office: 123 Connaught Place, New Delhi, India" << endl;
+                cout << "Phone: 011-23456789" << endl;
+                cout << "Email: [info@nationalbank.in]" << endl;
+                cout << "Website: nationalbank.in" << endl;
+                cout<<"------------------------------------------------------"<<endl;
+                cout << "Branches:" << endl;
+                cout<<"------------------------------------------------------"<<endl;
+                cout << "Mumbai Branch: 456 Marine Drive, Mumbai, India" << endl;
+                cout << "Phone: 022-12345678" << endl;
+                cout << "Email: [mumbai@nationalbank.in])" << endl;
+                cout<<"------------------------------------------------------"<<endl;
+                cout << "Bangalore Branch: 789 MG Road, Bangalore, India" << endl;
+                cout << "Phone: 080-4567890" << endl;
+                cout << "Email: [bangalore@nationalbank.in])" << endl;
+                cout<<"------------------------------------------------------"<<endl;
+                cout << "Feedback:" << endl;
+                cout<<"------------------------------------------------------"<<endl;
+                string feedback;
+                cin.ignore(numeric_limits<streamsize>::max(), '\n');
+                cout << "Enter your feedback or query: " << endl;
+                getline(cin, feedback);
+                cout << "Thank you for your feedback! We will get back to you soon." << endl;
+                cout<<"Enter Again or Press 5 To Exit"<<endl;
+                break;
+        }
         case 5:
             cout<<"Thank you for visiting us"<<endl;
             break;
@@ -458,4 +558,4 @@ int main(){
         }
     }
     return 0;
-} 
+}
